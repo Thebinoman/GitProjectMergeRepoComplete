@@ -5,13 +5,20 @@ on:
       - 'main'
 jobs:
   BuildSimulation:
-    # TODO abort this workflow if the git user triggered it is not the release manager
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Build
         run: |
+          release_manager="Thebinoman"
+          push_user="${{ github.actor }}"
           echo building and packing and app...
+          if [[ "$push_user" != "$release_manager" ]]; then
+            echo "Workflow aborted. User $push_user is not authorized for release."
+            exit 1
+          else
+            echo "$push_user is authorized for release." 
+          fi
   DeploySimulation:
     runs-on: ubuntu-latest
     needs: BuildSimulation
